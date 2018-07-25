@@ -1,0 +1,7 @@
+dependencies {
+    compile group: 'org.apache.poi', name: 'poi', version: "$poi"
+    compile group: 'org.apache.poi', name: 'poi-ooxml', version: "$poi"
+
+
+    testCompile group: 'junit', name: 'junit', version: "$junit"
+}
