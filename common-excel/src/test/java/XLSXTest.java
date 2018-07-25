@@ -1,9 +1,14 @@
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.SpreadsheetVersion;
+import org.apache.poi.ss.util.AreaReference;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.*;
 import org.junit.jupiter.api.Test;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.closeTo;
@@ -48,6 +53,27 @@ public class XLSXTest {
         XSSFWorkbook updateWorkBook = new XSSFWorkbook(getFile("update.xlsx"));
         assertThat(getCell(updateWorkBook.getSheet(sheetName), "D4").getNumericCellValue(), closeTo(200, 0.1));
         assertThat(getCell(updateWorkBook.getSheet(sheetName), "D13").getNumericCellValue(), closeTo(23500, 0.1));
+    }
+
+    @Test
+    void should_able_to_get_cell_by_name() throws IOException, InvalidFormatException {
+        XSSFWorkbook workbook = new XSSFWorkbook(getFile("test.xlsx"));
+
+        XSSFCell cell = getCellByName(workbook, "test_name");
+
+        assertThat(cell.getStringCellValue(), is("TV set"));
+
+
+    }
+
+    private XSSFCell getCellByName(XSSFWorkbook workbook, String cellName) {
+        XSSFName test_name = workbook.getName(cellName);
+        AreaReference areaReference = new AreaReference(test_name.getRefersToFormula(), SpreadsheetVersion.EXCEL2007);
+
+        CellReference firstCell = areaReference.getFirstCell();
+        XSSFSheet sheet = workbook.getSheet(firstCell.getSheetName());
+        XSSFRow row = sheet.getRow(firstCell.getRow());
+        return row.getCell(firstCell.getCol());
     }
 
     private void copyFileUsingStream(File source, File dest) throws IOException {
